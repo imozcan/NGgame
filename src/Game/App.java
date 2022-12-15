@@ -3,8 +3,7 @@ package Game;
 public class App {
 	public static void main(String[] args) throws InterruptedException
 	{
-		Text.startText();
-		Checker.controller();
+		Text.startText();	
 	}
 }
 
@@ -14,13 +13,13 @@ class GenerateRandom {
 		java.util.Random r = new java.util.Random();            
         int low = 1; int high = 50; int RandomNumber;
         RandomNumber = r.nextInt(high - low) + low;
+        System.out.println("Rondom Num: " + RandomNumber);
         return RandomNumber;
 	}
 }
 
 class Text {
-	private static final String th = null;
-
+	
 	public static void startText() throws InterruptedException
 	{
 		System.out.println("Hello...");
@@ -38,23 +37,37 @@ class Text {
 		System.out.println( "Let's see if you can find this number in 5 times with a little help :)");
 		System.out.println();
 		Thread.sleep(500);
+		
+		Checker.controller();
 	}
 
 	public static void answerText()
 	{
-	int count = Counter.increase() - 1;
+	int count = Counter.increase() - 1; //-1 --> two method fixes linked to one Counter.
+	SuffixCounter.decrease(); //fixes two method linked to one SuffixCounter.
+	String suffix = Text.suffixText();
+	System.out.println("Congratulations, you got the right answer on the  " + count + suffix + ". try");
+	}
+		
+	public static  String suffixText()
+	 {
+		 int count = SuffixCounter.increase();
+		 String suffix;
+			if ( count == 1)
+				suffix = "st";
+			else if (count == 2)
+				suffix = "nd";
+			else if (count == 3)
+				suffix = "rd";
+			else
+				suffix = "th";
+			
+			return suffix;
+	 }
 	
-	String suffix;
-	if (count == 1)
-		suffix = "st";
-	else if (count == 2)
-		suffix = "nd";
-	else if (count == 3)
-		suffix = "rd";
-	else
-		suffix = "th";
-	
-	System.out.println("Congratulations, you got the right answer on the  " + count + suffix + ". try");	
+	public static void starText()
+	{
+		System.out.println("*");
 	}
 }
 class Request {
@@ -62,16 +75,8 @@ class Request {
 	public static int takeNumber()
 	{
 		int count = Counter.increase();
+		String suffix = Text.suffixText();
 		
-		String suffix;
-		if (count == 1)
-			suffix = "st";
-		else if (count == 2)
-			suffix = "nd";
-		else if (count == 3)
-			suffix = "rd";
-		else
-			suffix = "th";
 		
 		java.util.Scanner kb = new java.util.Scanner(System.in);
 		System.out.print("Enter your "+ count + suffix +" guess : ");
@@ -86,18 +91,23 @@ class Checker {
 	{
 		int RandomNumber = GenerateRandom.random();
 		int Answer = Request.takeNumber();
+		int i;
 		
-		
-		for (int i = 1; i <= 4; i = i + 1)
-			if (RandomNumber == Answer) {
-				i = 4;
+		for (i = 1; i <= 5; i = i + 1)
+			if (RandomNumber == Answer) { 
 				Text.answerText();
+				break;
 			}
 			else
-			{
-				System.out.println("Sorry, wrong Answer ");
-				Answer = Request.takeNumber();		
+			{	
+				if (RandomNumber < Answer)
+					System.out.println("Sorry, wrong Answer, try less than " + Answer);
+				else
+					System.out.println("Sorry, wrong Answer, try more than " + Answer);             
+				if (i < 5)
+					Answer = Request.takeNumber();		
 			}
+		if (i > 5)
 		System.out.println("The correct answer would be " + RandomNumber);
 	}
 }
@@ -108,5 +118,15 @@ class Checker {
         count++;
         return count;
     }
-   
 }
+ class SuffixCounter {
+	    private static int suffixCount = 0;
+	    public static int increase() {
+	    	suffixCount++;
+	        return suffixCount;
+	    }   
+	    public static int decrease() {
+	    	suffixCount--;
+		    return suffixCount;
+	    } 
+	}
